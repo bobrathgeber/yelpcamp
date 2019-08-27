@@ -14,6 +14,6 @@ app.get("/about", function(req, res){
 console.log("Hello!");
 
 //Start listening for requests
-app.listen(30000, function() {
+app.listen(process.env.PORT, function() {
 	console.log('Server listening on port 30000');
 });
