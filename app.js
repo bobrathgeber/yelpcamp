@@ -18,6 +18,6 @@ app.get("/contact", function(req, res){
 console.log("Hello!");
 
 //Start listening for requests
-app.listen(process.env.PORT, process.env.IP, function() {
-	console.log('Server listening on port '+ process.env.PORT);
+app.listen(30000, function() {
+	console.log('Server listening on port '+ 30000);
 });
