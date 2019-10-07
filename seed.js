@@ -20,7 +20,7 @@ var seeds = [
     }
 ]
  
-function seedDB(){
+async function seedDB(){
    //Remove all campgrounds
     try {
         await Campground.remove({});
