@@ -1,17 +1,11 @@
 var express 	= require("express"),
     app 		= express(),
     bodyParser  = require("body-parser"),
-	mongoose	= require("mongoose");
+	mongoose	= require("mongoose"),
+	Campground 	= require("./models/campground");
 
 mongoose.connect('mongodb://localhost:27017/yelp_camp', { useNewUrlParser: true }); 
 
-// SCHEMA SETUP
-var campgroundSchema = new mongoose.Schema({
-	name: String,
-	image: String
-});
-
-var Campground = mongoose.model("Campground", campgroundSchema);
 
 // Campground.create({
 // 	name: "Granite Hill", 
@@ -24,17 +18,6 @@ var Campground = mongoose.model("Campground", campgroundSchema);
 // 		}
 // 	});
 
-// var campgrounds = [
-// 		{name: "Salmon Creek", image: "https://cdn.pixabay.com/photo/2016/11/29/04/17/bonfire-1867275_960_720.jpg"},
-// 		{name: "Granite Hill", image: "https://cdn.pixabay.com/photo/2016/01/19/16/48/teepee-1149402_960_720.jpg"},
-// 		{name: "Mountain Goat's Rest", image: "https://cdn.pixabay.com/photo/2016/11/21/16/03/campfire-1846142_960_720.jpg"},
-// 		{name: "Salmon Creek", image: "https://cdn.pixabay.com/photo/2016/11/29/04/17/bonfire-1867275_960_720.jpg"},
-// 		{name: "Granite Hill", image: "https://cdn.pixabay.com/photo/2016/01/19/16/48/teepee-1149402_960_720.jpg"},
-// 		{name: "Mountain Goat's Rest", image: "https://cdn.pixabay.com/photo/2016/11/21/16/03/campfire-1846142_960_720.jpg"},
-// 		{name: "Salmon Creek", image: "https://cdn.pixabay.com/photo/2016/11/29/04/17/bonfire-1867275_960_720.jpg"},
-// 		{name: "Granite Hill", image: "https://cdn.pixabay.com/photo/2016/01/19/16/48/teepee-1149402_960_720.jpg"},
-// 		{name: "Mountain Goat's Rest", image: "https://cdn.pixabay.com/photo/2016/11/21/16/03/campfire-1846142_960_720.jpg"}
-// 	];
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
@@ -43,14 +26,28 @@ app.get("/", function(req, res){
 	res.render("landing");
 });
 
+// RESTFUL ROUTES
+//
+// name       url       verb      desc.
+//=====================================
+// INDEX	/dogs		GET		Display list of all dogs
+// NEW		/dogs/new	GET		Displays form to make new dog
+// CREATE	/dogs		POST	Add new dog to DB
+// SHOW		/dogs/:id	GET		Shows info about one dog
+
+//C reate
+//R ead
+//U pdate
+//D estroy	
+
 app.get("/campgrounds", function(req, res){
 	Campground.find({}, function(err, allcampgrounds){
 		if(err){
 			console.log(err);
 		} else {
-			res.render("campgrounds", {campgrounds: allcampgrounds});
+			res.render("index", {campgrounds: allcampgrounds});
 		}
-	})
+	});
 	//res.render("campgrounds", {campgrounds: campgrounds});
 });
 
@@ -59,7 +56,8 @@ app.post("/campgrounds", function(req, res){
 	// redirect back to campgrounds
 	var name = req.body.name;
 	var image = req.body.image;
-	var newCampground = {name: name, image: image};
+	var description = req.body.description;
+	var newCampground = {name: name, image: image, description: description};
 	//campgrounds.push(newCampground);
 	Campground.create(newCampground, 
 		function(err, campground) {
@@ -70,10 +68,20 @@ app.post("/campgrounds", function(req, res){
 			}
 		});
 	res.redirect("/campgrounds");
-})
+});
 
 app.get("/campgrounds/new", function(req, res) {
 	res.render("new.ejs");
+});
+
+app.get("/campgrounds/:id", function(req, res){
+	Campground.findById(req.params.id, function(err, foundCampground){
+		if(err) {
+			console.log(err);
+		} else {			
+			res.render("show", {campground: foundCampground});
+		}
+	});
 });
 
 //Start listening for requests
